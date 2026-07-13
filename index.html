@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cyanide RepoTweaks source and LightSaber runtime sources.">
+  <meta name="theme-color" content="#0d1719">
+  <title>Cyanide RepoTweaks</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f7f6;
+      --surface: #ffffff;
+      --text: #172124;
+      --muted: #607075;
+      --line: #d6e0df;
+      --cyan: #007f87;
+      --cyan-soft: #e2f2f1;
+      --orange: #b95118;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1719;
+        --surface: #132123;
+        --text: #edf5f3;
+        --muted: #a9bcbd;
+        --line: #294244;
+        --cyan: #4cc8c2;
+        --cyan-soft: #123b3d;
+        --orange: #ffad7c;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.5; }
+    a { color: inherit; }
+    main { width: min(100% - 32px, 900px); margin: 0 auto; padding: 52px 0 40px; }
+    header { display: flex; align-items: center; gap: 16px; padding-bottom: 30px; border-bottom: 1px solid var(--line); }
+    .mark { display: grid; width: 52px; height: 52px; place-items: center; border: 1px solid var(--cyan); color: var(--cyan); font: 700 18px/1 var(--mono); }
+    h1, h2, p { margin: 0; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: 0; }
+    .intro { color: var(--muted); margin-top: 4px; }
+    section { padding: 30px 0; border-bottom: 1px solid var(--line); }
+    h2 { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+    .source-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: stretch; }
+    code { font-family: var(--mono); }
+    .source { overflow-x: auto; padding: 13px 14px; border: 1px solid var(--line); background: var(--surface); color: var(--cyan); white-space: nowrap; }
+    button, .button { min-height: 44px; border: 1px solid var(--cyan); background: var(--cyan); color: #fff; padding: 0 15px; font: 600 14px var(--sans); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+    button:hover, .button:hover { filter: brightness(0.94); }
+    .links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .button.secondary { color: var(--cyan); background: transparent; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+    .item { min-height: 122px; padding: 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); }
+    .item-label { color: var(--muted); font-size: 13px; }
+    .item-value { margin-top: 7px; font-size: 19px; font-weight: 700; }
+    .item-value.accent { color: var(--orange); }
+    .item p { margin-top: 5px; color: var(--muted); font-size: 14px; }
+    footer { color: var(--muted); font-size: 13px; padding-top: 22px; }
+    @media (max-width: 600px) {
+      main { width: min(100% - 24px, 900px); padding-top: 28px; }
+      header { align-items: flex-start; }
+      .source-row { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="mark" aria-hidden="true">CY</div>
+      <div>
+        <h1>Cyanide RepoTweaks</h1>
+        <p class="intro">JavaScript tweak source for Cyanide and retained LightSaber runtime material.</p>
+      </div>
+    </header>
+
+    <section>
+      <h2>Add This Source</h2>
+      <div class="source-row">
+        <code id="source-url" class="source">https://hxhlb.github.io/cyanide-repotweaks.json</code>
+        <button id="copy-source" type="button">Copy Source</button>
+      </div>
+      <div class="links">
+        <a class="button secondary" href="tweaks.html">Browse JavaScript Tweaks</a>
+        <a class="button secondary" href="https://github.com/hxhlb/cyanide">Cyanide on GitHub</a>
+      </div>
+    </section>
+
+    <section>
+      <h2>Contents</h2>
+      <div class="grid">
+        <div class="item">
+          <div class="item-label">Published Scripts</div>
+          <div class="item-value" id="script-count">Loading</div>
+          <p>Entries served by the RepoTweaks JSON source.</p>
+        </div>
+        <div class="item">
+          <div class="item-label">Cleanup Contract</div>
+          <div class="item-value accent">cleanup()</div>
+          <p>Scripts can restore their own in-memory SpringBoard state before stopping.</p>
+        </div>
+        <div class="item">
+          <div class="item-label">LightSaber</div>
+          <div class="item-value">Runtime Sources</div>
+          <p><a href="lightsaber/">Browse retained LightSaber JavaScript sources.</a></p>
+        </div>
+        <div class="item">
+          <div class="item-label">Scope</div>
+          <div class="item-value">Cyanide Only</div>
+          <p>This site no longer hosts the previous unrelated APT repository or personal pages.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>Only install scripts and sources you trust. RepoTweaks execute through Cyanide's SpringBoard RemoteCall bridge.</footer>
+  </main>
+  <script>
+    const sourceURL = document.getElementById('source-url').textContent;
+    document.getElementById('copy-source').addEventListener('click', async (event) => {
+      try {
+        await navigator.clipboard.writeText(sourceURL);
+        event.currentTarget.textContent = 'Copied';
+        setTimeout(() => { event.currentTarget.textContent = 'Copy Source'; }, 1400);
+      } catch (_) {
+        event.currentTarget.textContent = 'Copy Failed';
+      }
+    });
+    fetch('cyanide-repotweaks.json?_=' + Date.now())
+      .then((response) => response.json())
+      .then((repo) => { document.getElementById('script-count').textContent = (repo.tweaks || []).length + ' tweaks'; })
+      .catch(() => { document.getElementById('script-count').textContent = 'Unavailable'; });
+  </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "repoName": "Cyanide RepoTweaks",
+  "author": "hxhlb",
+  "tweaks": [
+    {
+      "id": "lightsaber.hide-dock",
+      "name": "隐藏 Dock",
+      "description": "隐藏主屏幕 Dock 背景。也会隐藏 Dock 中的 app 图标，请在应用前先把图标移到主屏幕网格。恢复需要重启 SpringBoard。",
+      "version": "1.0.6",
+      "author": "@MinePlayer16",
+      "symbol": "dock.rectangle",
+      "scriptURL": "https://hxhlb.github.io/hide_dock.js?v=6"
+    },
+    {
+      "id": "lightsaber.hide-homebar",
+      "name": "隐藏 Home Bar",
+      "description": "隐藏底部 Home 指示条。应用后需要重启 SpringBoard，让 SpringBoard 刷新资源缓存。",
+      "version": "1.0.3",
+      "author": "zeroxjf",
+      "symbol": "line.3.horizontal",
+      "scriptURL": "https://hxhlb.github.io/hide_homebar.js?v=4"
+    },
+    {
+      "id": "lightsaber.dock-color",
+      "name": "Dock 颜色",
+      "description": "使用自定义颜色修改 Dock 背景。适用于 iOS 26 及更早版本。",
+      "version": "1.0.1",
+      "author": "@MinePlayer16",
+      "symbol": "paintpalette.fill",
+      "scriptURL": "https://hxhlb.github.io/dock_color.js?v=2"
+    },
+    {
+      "id": "lightsaber.hide-search-pill",
+      "name": "隐藏搜索按钮",
+      "description": "隐藏主屏幕上的搜索按钮。仅在 iOS 18 及以下版本测试过。",
+      "version": "1.0.7",
+      "author": "@MinePlayer16",
+      "symbol": "magnifyingglass",
+      "scriptURL": "https://hxhlb.github.io/hide_searchpill.js?v=8",
+      "maxIOS": "18.x",
+      "compatibilityNote": "仅在 iOS 18 及以下版本测试过。",
+      "unsupportedMessage": "仅在 iOS 18 及以下版本测试过。"
+    },
+    {
+      "id": "lightsaber.floating-icons",
+      "name": "图标漂浮",
+      "description": "为主屏幕和 Dock 图标添加轻微漂浮动画，可配置移动、旋转和缩放效果。",
+      "version": "1.0.0",
+      "author": "@MinePlayer16",
+      "symbol": "wind",
+      "scriptURL": "https://hxhlb.github.io/floating_icons.js?v=1"
+    },
+    {
+      "id": "lightsaber.dump-views",
+      "name": "导出视图树",
+      "description": "诊断工具：将当前可见的 SpringBoard 视图树导出到 /tmp。",
+      "version": "1.0.1",
+      "author": "@MinePlayer16",
+      "symbol": "ladybug.fill",
+      "scriptURL": "https://hxhlb.github.io/dump-views.js?v=2"
+    }
+  ]
+}
