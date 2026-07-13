@@ -5,7 +5,7 @@
 (function () {
     "use strict";
 
-    var VERSION = "1.0.2";
+    var VERSION = "1.0.3";
     say("[DockColor] Starting v" + VERSION + "...");
 
     function say(msg) {
@@ -62,12 +62,15 @@
         var s = String(input || "").trim();
         if (!s) s = "#FF0000";
         if (s.charAt(0) === "#") s = s.slice(1);
-        if (/^[0-9a-fA-F]{3}$/.test(s)) {
-            s = s.charAt(0) + s.charAt(0) + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2);
+        if (/^[0-9a-fA-F]{3,4}$/.test(s)) {
+            var expanded = "";
+            for (var i = 0; i < s.length; i++) expanded += s.charAt(i) + s.charAt(i);
+            s = expanded;
         }
-        if (!/^[0-9a-fA-F]{6}$/.test(s)) {
-            say("[DockColor] Invalid color; using #FF0000.");
-            s = "FF0000";
+        if (/^[0-9a-fA-F]{6}$/.test(s)) s += "FF";
+        if (!/^[0-9a-fA-F]{8}$/.test(s)) {
+            say("[DockColor] Invalid color; using #FF0000FF.");
+            s = "FF0000FF";
         }
         return s.toUpperCase();
     }
@@ -77,7 +80,8 @@
         var r = parseInt(hex.substring(0, 2), 16) / 255.0;
         var g = parseInt(hex.substring(2, 4), 16) / 255.0;
         var b = parseInt(hex.substring(4, 6), 16) / 255.0;
-        var colorString = r + " " + g + " " + b + " 1.0";
+        var a = parseInt(hex.substring(6, 8), 16) / 255.0;
+        var colorString = r + " " + g + " " + b + " " + a;
         var colorStr = ns(colorString);
         var ciColor = msg(cls("CIColor"), "colorWithString:", colorStr);
         var uiColor = msg(cls("UIColor"), "colorWithCIColor:", ciColor);

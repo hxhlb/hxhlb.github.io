@@ -24,10 +24,10 @@
       "id": "lightsaber.dock-color",
       "name": "Dock 颜色",
       "description": "使用自定义颜色修改 Dock 背景。适用于 iOS 26 及更早版本。",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "author": "@MinePlayer16",
       "symbol": "paintpalette.fill",
-      "scriptURL": "https://hxhlb.github.io/dock_color.js?v=3"
+      "scriptURL": "https://hxhlb.github.io/dock_color.js?v=4"
     },
     {
       "id": "lightsaber.hide-search-pill",
