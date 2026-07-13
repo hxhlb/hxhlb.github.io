@@ -5,7 +5,7 @@
 (function () {
     "use strict";
 
-    var VERSION = "1.0.1";
+    var VERSION = "1.0.2";
     say("[DockColor] Starting v" + VERSION + "...");
 
     function say(msg) {
@@ -158,9 +158,7 @@
         for (var i = 0; i < coloredTargets.length; i++) {
             var target = coloredTargets[i];
             if (!isPtr(target.view)) continue;
-            if (isPtr(target.backgroundColor)) {
-                msgMain(target.view, "setBackgroundColor:", target.backgroundColor);
-            }
+            msgMain(target.view, "setBackgroundColor:", isPtr(target.backgroundColor) ? target.backgroundColor : 0);
             msgMain(target.view, "setHidden:", target.hidden ? 1 : 0);
             msgMain(target.view, "setNeedsLayout");
             restored++;
