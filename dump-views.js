@@ -5,7 +5,7 @@
 (function () {
     "use strict";
 
-    var VERSION = "1.0.0";
+    var VERSION = "1.1.0";
 
     function say(msg) {
         try { if (typeof log === "function") { log(String(msg)); return; } } catch (_) {}
@@ -30,6 +30,71 @@
     function msgMain(obj, sel, a1, a2, a3, a4) { if (!isPtr(obj)) return 0; try { return r_msg2_main(obj, sel, a1 || 0, a2 || 0, a3 || 0, a4 || 0); } catch (_) { return 0; } }
     function ns(str) { try { return r_nsstr(String(str)); } catch (_) { return 0; } }
     function count(arrayObj) { var c = msgMain(arrayObj, "count"); var n = parseInt(c, 0); return isFinite(n) ? n : 0; }
+
+    function appendText(target, text) {
+        msgMain(target, "appendString:", ns(String(text)));
+    }
+
+    function appendRemoteLine(target, label, object) {
+        appendText(target, label);
+        if (!isPtr(object)) {
+            appendText(target, "<nil>\n");
+            return;
+        }
+        var description = msgMain(object, "description");
+        if (isPtr(description)) msgMain(target, "appendString:", description);
+        else appendText(target, "<description unavailable>");
+        appendText(target, "\n");
+    }
+
+    function appendControllerTree(target, controller) {
+        var seen = {};
+        var emitted = 0;
+
+        function walk(vc, depth, relation) {
+            if (!isPtr(vc) || depth > 12 || emitted >= 160) return;
+            var key = String(vc);
+            var indent = new Array(depth + 1).join("  ");
+            if (seen[key]) {
+                appendText(target, indent + relation + ": <cycle " + key + ">\n");
+                return;
+            }
+            seen[key] = true;
+            emitted++;
+            appendText(target, indent + relation + ": ");
+            var description = msgMain(vc, "description");
+            if (isPtr(description)) msgMain(target, "appendString:", description);
+            else appendText(target, key);
+            appendText(target, "\n");
+
+            var children = msgMain(vc, "childViewControllers");
+            var childCount = Math.min(count(children), 64);
+            for (var childIndex = 0; childIndex < childCount; childIndex++) {
+                walk(msgMain(children, "objectAtIndex:", childIndex), depth + 1, "child[" + childIndex + "]");
+            }
+            var presented = msgMain(vc, "presentedViewController");
+            if (isPtr(presented)) walk(presented, depth + 1, "presented");
+        }
+
+        walk(controller, 0, "root");
+        if (emitted >= 160) appendText(target, "  <controller tree truncated at 160 nodes>\n");
+    }
+
+    function appendResponderChain(target, object) {
+        appendText(target, "RESPONDER CHAIN\n");
+        var current = object;
+        var seen = {};
+        for (var depth = 0; depth < 16 && isPtr(current); depth++) {
+            var key = String(current);
+            if (seen[key]) {
+                appendText(target, "  <cycle " + key + ">\n");
+                return;
+            }
+            seen[key] = true;
+            appendRemoteLine(target, "  [" + depth + "] ", current);
+            current = msgMain(current, "nextResponder");
+        }
+    }
 
     var delaySeconds = Number((typeof delaySec !== "undefined") ? delaySec : 5);
     if (!isFinite(delaySeconds)) delaySeconds = 5;
@@ -71,22 +136,35 @@
         for (var i = winCount - 1; i >= 0; i--) {
             var win = msgMain(windows, "objectAtIndex:", i);
             if (!isPtr(win)) continue;
-            if (!rootVC && truthy(msgMain(win, "isHidden")) === false) {
-                rootVC = msgMain(win, "rootViewController");
+            var hidden = truthy(msgMain(win, "isHidden"));
+            var windowRootVC = msgMain(win, "rootViewController");
+            if (!rootVC && !hidden && isPtr(windowRootVC)) rootVC = windowRootVC;
+            appendText(fullDump, "==========================================\n");
+            appendText(fullDump, "WINDOW " + i + " hidden=" + hidden + "\n");
+            appendText(fullDump, "==========================================\n");
+            appendRemoteLine(fullDump, "window: ", win);
+            appendRemoteLine(fullDump, "delegate: ", msgMain(win, "delegate"));
+            appendRemoteLine(fullDump, "windowScene: ", msgMain(win, "windowScene"));
+            appendText(fullDump, "VIEW CONTROLLERS\n");
+            if (isPtr(windowRootVC)) appendControllerTree(fullDump, windowRootVC);
+            else appendText(fullDump, "root: <nil>\n");
+            appendResponderChain(fullDump, win);
+
+            if (hidden) {
+                appendText(fullDump, "VIEW TREE\n<skipped: window hidden>\n\n");
+                foundCount++;
+                continue;
             }
-            if (truthy(msgMain(win, "isHidden"))) continue;
             var dumpStr = msgMain(win, "recursiveDescription");
-            if (!isPtr(dumpStr)) continue;
-            msgMain(fullDump, "appendString:", ns("==========================================\n"));
-            msgMain(fullDump, "appendString:", ns("WINDOW " + i + "\n"));
-            msgMain(fullDump, "appendString:", ns("==========================================\n"));
-            msgMain(fullDump, "appendString:", dumpStr);
-            msgMain(fullDump, "appendString:", ns("\n\n"));
+            appendText(fullDump, "VIEW TREE\n");
+            if (isPtr(dumpStr)) msgMain(fullDump, "appendString:", dumpStr);
+            else appendText(fullDump, "<recursiveDescription unavailable>");
+            appendText(fullDump, "\n\n");
             foundCount++;
         }
 
         if (foundCount <= 0) {
-            say("[Dump-Views] ERROR: no visible windows returned recursiveDescription.");
+            say("[Dump-Views] ERROR: UIApplication returned no windows.");
             return;
         }
 
