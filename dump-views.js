@@ -5,7 +5,7 @@
 (function () {
     "use strict";
 
-    var VERSION = "1.1.0";
+    var VERSION = "1.1.1";
 
     function say(msg) {
         try { if (typeof log === "function") { log(String(msg)); return; } } catch (_) {}
@@ -78,6 +78,7 @@
 
         walk(controller, 0, "root");
         if (emitted >= 160) appendText(target, "  <controller tree truncated at 160 nodes>\n");
+        return emitted;
     }
 
     function appendResponderChain(target, object) {
@@ -133,9 +134,16 @@
         var foundCount = 0;
         var rootVC = 0;
 
+        say("[Dump-Views] Found " + winCount + " window(s). Starting traversal...");
+
         for (var i = winCount - 1; i >= 0; i--) {
+            var progress = winCount - i;
+            say("[Dump-Views] Window " + progress + "/" + winCount + " (index " + i + "): reading metadata...");
             var win = msgMain(windows, "objectAtIndex:", i);
-            if (!isPtr(win)) continue;
+            if (!isPtr(win)) {
+                say("[Dump-Views] Window " + progress + "/" + winCount + ": unavailable; skipped.");
+                continue;
+            }
             var hidden = truthy(msgMain(win, "isHidden"));
             var windowRootVC = msgMain(win, "rootViewController");
             if (!rootVC && !hidden && isPtr(windowRootVC)) rootVC = windowRootVC;
@@ -146,16 +154,21 @@
             appendRemoteLine(fullDump, "delegate: ", msgMain(win, "delegate"));
             appendRemoteLine(fullDump, "windowScene: ", msgMain(win, "windowScene"));
             appendText(fullDump, "VIEW CONTROLLERS\n");
-            if (isPtr(windowRootVC)) appendControllerTree(fullDump, windowRootVC);
+            var controllerCount = 0;
+            if (isPtr(windowRootVC)) controllerCount = appendControllerTree(fullDump, windowRootVC);
             else appendText(fullDump, "root: <nil>\n");
             appendResponderChain(fullDump, win);
+            say("[Dump-Views] Window " + progress + "/" + winCount + ": metadata complete (hidden=" + hidden + ", controllers=" + controllerCount + ").");
 
             if (hidden) {
                 appendText(fullDump, "VIEW TREE\n<skipped: window hidden>\n\n");
                 foundCount++;
+                say("[Dump-Views] Window " + progress + "/" + winCount + ": hidden view tree skipped.");
                 continue;
             }
+            say("[Dump-Views] Window " + progress + "/" + winCount + ": requesting recursiveDescription...");
             var dumpStr = msgMain(win, "recursiveDescription");
+            say("[Dump-Views] Window " + progress + "/" + winCount + ": recursiveDescription returned.");
             appendText(fullDump, "VIEW TREE\n");
             if (isPtr(dumpStr)) msgMain(fullDump, "appendString:", dumpStr);
             else appendText(fullDump, "<recursiveDescription unavailable>");
@@ -171,6 +184,7 @@
         var timestamp = Math.floor(Date.now() / 1000);
         var path = "/tmp/UITreeDump_" + timestamp + ".txt";
         var pathStr = ns(path);
+        say("[Dump-Views] Traversal complete. Writing " + foundCount + " window(s) to " + path + "...");
         var ok = msgMain(fullDump, "writeToFile:atomically:encoding:error:", pathStr, 1, 4, 0);
         if (!truthy(ok)) {
             say("[Dump-Views] ERROR: could not save " + path);
